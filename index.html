@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0d0b">
+<title>Asistencia Profes 2026</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0f0d0b;
+  --surface: #181512;
+  --surface-2: #211d19;
+  --line: #3a342d;
+  --text: #ece3d2;
+  --muted: #9b9082;
+  --accent: #e4d6b8;
+  --accent-ink: #14110e;
+  --gold: #c9b48a;
+  --ok: #8fc19a;
+  --danger: #e5736f;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { margin: 0; }
+
+button, select, input { touch-action: manipulation; }
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.45;
+}
+
+.wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding:
+    calc(env(safe-area-inset-top) + 22px)
+    max(16px, env(safe-area-inset-right))
+    200px
+    max(16px, env(safe-area-inset-left));
+}
+
+/* Cabecera */
+.hero { margin-bottom: 22px; }
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 9vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+h1 .grad { color: var(--gold); }
+.sub { margin: 10px 0 0; color: var(--muted); text-transform: capitalize; font-size: 0.98rem; }
+
+/* Tarjetas */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.card.invalid {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.label {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.label .req { color: var(--accent); }
+
+select, input[type="date"], input[type="time"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+select option { color: #111; background: #fff; }
+
+select:focus-visible, input:focus-visible, button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Tira de días */
+.days {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 16px 12px;
+  margin: 0 -16px 4px;
+  scroll-padding: 0 16px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.days::-webkit-scrollbar { display: none; }
+
+.day {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 58px;
+  min-height: 78px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+}
+.day:active { transform: scale(0.96); }
+.day .dow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.day .num { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+.day .tag { font-size: 0.64rem; color: var(--gold); font-weight: 600; min-height: 1em; }
+.day[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.day[aria-pressed="true"] .dow,
+.day[aria-pressed="true"] .tag { color: var(--accent-ink); }
+
+.date-other { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+.date-other span { color: var(--muted); font-size: 0.9rem; }
+.date-other input.active { border-color: var(--accent); }
+
+.note {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px 10px 10px 4px;
+}
+.note strong { color: var(--text); font-weight: 600; }
+
+/* Controles segmentados */
+.seg { display: grid; gap: 8px; grid-template-columns: repeat(2, 1fr); }
+.seg.three { grid-template-columns: repeat(3, 1fr); }
+
+.opt {
+  min-height: 54px;
+  padding: 8px 6px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+}
+.opt:active { transform: scale(0.97); }
+.opt[aria-checked="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.opt.noshow[aria-checked="true"] {
+  background: #0a0807;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.opt small { display: block; font-weight: 500; font-size: 0.72rem; opacity: 0.85; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: rgba(201, 180, 138, 0.14);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.time-12 { margin: 10px 0 0; color: var(--muted); font-size: 0.9rem; }
+.time-12 strong { color: var(--text); font-weight: 600; }
+
+.ghost {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 12px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.ghost:active { background: var(--surface-2); }
+
+.link {
+  display: block;
+  margin: 8px auto 0;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.foot { text-align: center; margin-top: 18px; font-size: 0.82rem; color: var(--muted); }
+.foot a { color: var(--muted); }
+
+/* Barra de envío fija */
+.bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  padding: 10px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 12px) max(16px, env(safe-area-inset-left));
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  z-index: 5;
+}
+.bar-in { max-width: 520px; margin: 0 auto; }
+#status { min-height: 1.3em; margin: 0 0 8px; font-size: 0.88rem; text-align: center; color: var(--muted); }
+#status.err { color: var(--danger); }
+
+.send {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.12s, opacity 0.2s;
+}
+.send:active { transform: scale(0.98); }
+.send:disabled { opacity: 0.6; cursor: progress; }
+
+/* Pantalla de éxito */
+.done {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  text-align: center;
+  background: rgba(4, 3, 2, 0.94);
+  overflow-y: auto;
+}
+.done[hidden] { display: none; }
+.done-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+.check {
+  width: 72px; height: 72px;
+  margin: 0 auto 16px;
+  display: grid; place-items: center;
+  font-size: 2.2rem;
+  color: #14281b;
+  background: var(--ok);
+  border-radius: 50%;
+}
+.done h2 { margin: 0 0 8px; font-family: var(--serif); font-size: 1.55rem; }
+.done p { margin: 0 0 20px; color: var(--muted); }
+
+/* Pestañas */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin: 0 0 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.tab {
+  min-height: 46px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tab[aria-selected="true"] {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+/* Interruptor de modo prueba */
+.mode {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0 0 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ok);
+  cursor: pointer;
+}
+.mode.live { color: var(--danger); }
+.mode input {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  background: var(--line);
+  border: 1px solid var(--muted);
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+.track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.mode input:checked + .track { background: var(--ok); }
+.mode input:checked + .track::after { transform: translateX(18px); }
+.mode input:focus-visible + .track { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.payload {
+  max-height: 40vh;
+  margin: 0 0 20px;
+  padding: 12px;
+  overflow: auto;
+  text-align: left;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.payload[hidden] { display: none; }
+
+/* Ganancias */
+.sums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.sum {
+  min-width: 0;
+  padding: 12px 6px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.sum span {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.sum strong {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 5vw, 1.4rem);
+  color: var(--gold);
+  overflow-wrap: anywhere;
+}
+
+/* Selector manual de minutos */
+.ghost.min-toggle { margin-top: 12px; min-height: 48px; }
+.minutes {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.minutes[hidden] { display: none; }
+.min-fine { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.min-fine .chip { min-width: 64px; min-height: 44px; }
+.min-val { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; color: var(--gold); }
+.minutes .chips { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; }
+.minutes .chip { min-height: 44px; padding: 0; }
+.minutes .chip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Confirmación de envío */
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.confirm-actions .send,
+.confirm-actions .mini { min-height: 54px; font-size: 1rem; }
+
+#earnList { margin-top: 14px; }
+.acc {
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.acc > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+.acc > summary::-webkit-details-marker { display: none; }
+.acc > summary::before {
+  content: "\25B8";
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.acc[open] > summary::before { transform: rotate(90deg); }
+.acc-t { flex: 1; min-width: 0; }
+.acc-m { font-family: var(--serif); color: var(--gold); }
+.acc-body { padding: 0 10px 10px; }
+.acc .acc { background: var(--surface-2); }
+.detail { padding: 2px 14px 14px; font-size: 0.92rem; color: var(--muted); }
+.detail p { margin: 4px 0; }
+.detail strong { color: var(--text); font-weight: 600; }
+.row-actions { display: flex; gap: 8px; margin-top: 10px; }
+.mini {
+  flex: 1;
+  min-height: 44px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.mini.danger { color: var(--danger); }
+.empty { padding: 18px 0; text-align: center; color: var(--muted); }
+
+/* Pantallas muy estrechas */
+@media (max-width: 380px) {
+  .opt { font-size: 0.88rem; padding: 8px 3px; }
+  .day { width: 54px; }
+}
+
+@media (min-width: 641px) {
+  .wrap { padding-top: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Registro de asistencia 2026</p>
+    <h1>Hola, <span class="grad" id="who">Wady</span> &#128075;</h1>
+    <p class="sub" id="dateLong"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button type="button" class="tab" role="tab" id="tab-att" aria-selected="true" aria-controls="view-att">Asistencia</button>
+    <button type="button" class="tab" role="tab" id="tab-earn" aria-selected="false" aria-controls="view-earn">Ganancias</button>
+  </nav>
+
+  <div id="view-att" role="tabpanel" aria-labelledby="tab-att">
+  <form id="form" novalidate autocomplete="off">
+
+    <section class="card" id="card-name">
+      <label class="label" for="name">Nombre <span class="req">*</span></label>
+      <select id="name"></select>
+    </section>
+
+    <section class="card" id="card-date">
+      <span class="label" id="lbl-date">Fecha de la clase <span class="req">*</span></span>
+      <div class="days" id="days" role="group" aria-labelledby="lbl-date"></div>
+      <div class="date-other">
+        <span>Otra fecha</span>
+        <input type="date" id="dateInput" aria-label="Elegir otra fecha en el calendario">
+      </div>
+      <p class="note" id="autoNote"></p>
+    </section>
+
+    <section class="card" id="card-branch">
+      <span class="label" id="lbl-branch">Sucursal <span class="req">*</span></span>
+      <div class="seg" id="branch" role="radiogroup" aria-labelledby="lbl-branch"></div>
+    </section>
+
+    <section class="card" id="card-time">
+      <label class="label" for="time">Hora de llegada <span class="req">*</span></label>
+      <input type="time" id="time">
+      <p class="time-12" id="time12"></p>
+      <div class="chips" id="timeChips" role="group" aria-label="Horas rápidas"></div>
+      <button type="button" class="ghost min-toggle" id="minToggle" aria-expanded="false" aria-controls="minPanel">Elegir minutos</button>
+      <div class="minutes" id="minPanel" hidden>
+        <div class="min-fine">
+          <button type="button" class="chip" id="minDown" aria-label="Restar un minuto">&minus;1</button>
+          <output class="min-val" id="minVal" aria-live="polite"></output>
+          <button type="button" class="chip" id="minUp" aria-label="Sumar un minuto">+1</button>
+        </div>
+        <div class="chips" id="minChips" role="group" aria-label="Minutos"></div>
+      </div>
+    </section>
+
+    <section class="card" id="card-salsa">
+      <span class="label" id="lbl-salsa">Salsa <span class="req">*</span></span>
+      <div class="seg three" id="salsa" role="radiogroup" aria-labelledby="lbl-salsa"></div>
+    </section>
+
+    <section class="card" id="card-bachata">
+      <span class="label" id="lbl-bachata">Bachata <span class="req">*</span></span>
+      <div class="seg three" id="bachata" role="radiogroup" aria-labelledby="lbl-bachata"></div>
+    </section>
+
+    <button type="button" class="ghost" id="noShow">&#128549; No llegué (Salsa y Bachata + 00:00)</button>
+    <button type="button" class="link" id="reset">Restablecer valores sugeridos</button>
+
+    <p class="foot">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz_j3d7CLQ9BZhcw82tWKYYxpg8EGcN83NVCFb0OYuuGvvHA/viewform" target="_blank" rel="noopener noreferrer">Abrir formulario original</a>
+    </p>
+  </form>
+  </div>
+
+  <section id="view-earn" role="tabpanel" aria-labelledby="tab-earn" hidden>
+    <div class="sums" aria-label="Resumen de ganancias">
+      <div class="sum"><span>Semana</span><strong id="sumWeek">$0</strong></div>
+      <div class="sum"><span>Mes</span><strong id="sumMonth">$0</strong></div>
+      <div class="sum"><span>Año</span><strong id="sumYear">$0</strong></div>
+    </div>
+
+    <p class="note">Titular <strong>$100</strong> · Auxiliar <strong>$50</strong> · No llegué <strong>$0</strong>. Cada día se guarda al enviar (o probar) la asistencia.</p>
+
+    <div id="earnList"></div>
+    <p class="foot">Los datos se guardan solo en este navegador.</p>
+  </section>
+</main>
+
+<div class="bar" id="bar">
+  <div class="bar-in">
+    <label class="mode" id="modeLabel">
+      <input type="checkbox" id="testMode" role="switch">
+      <span class="track" aria-hidden="true"></span>
+      <span id="modeText"></span>
+    </label>
+    <p id="status" role="status" aria-live="polite"></p>
+    <button type="button" class="send" id="send">Enviar asistencia</button>
+  </div>
+</div>
+
+<div class="done" id="done" hidden>
+  <div class="done-card" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+    <div class="check" aria-hidden="true">&#10003;</div>
+    <h2 id="doneTitle">¡Asistencia enviada!</h2>
+    <p id="doneText"></p>
+    <pre class="payload" id="payload" hidden></pre>
+    <button type="button" class="send" id="again">Registrar otro día</button>
+  </div>
+</div>
+
+<div class="done" id="confirm" hidden>
+  <div class="done-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+    <h2 id="confirmTitle">&iquest;Enviar de verdad?</h2>
+    <p id="confirmText"></p>
+    <div class="confirm-actions">
+      <button type="button" class="mini" id="confirmNo">Cancelar</button>
+      <button type="button" class="send" id="confirmYes">S&iacute;, enviar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Configuración del formulario ----------
+  const FORM_ID = "1FAIpQLSfz_j3d7CLQ9BZhcw82tWKYYxpg8EGcN83NVCFb0OYuuGvvHA";
+  const ACTION = "https://docs.google.com/forms/d/e/" + FORM_ID + "/formResponse";
+
+  const ENTRY = {
+    name: "766523784",
+    date: "1260578381",
+    branch: "616027784",
+    time: "1759949188",
+    salsa: "1174350136",
+    bachata: "1035525406"
+  };
+
+  const DEFAULT_NAME = "Wady";
+  const NAMES = [
+    "Airam", "Axel", "Brenda", "Caro", "Erick Cedano", "Erick R",
+    "Josu\u00E9", "Juan", "Mariemi", "Mario", "Sofi", "Wady", "Yaya"
+  ];
+
+  const VENADOS = "Venados";
+  const NAPOLES = "N\u00E1poles";
+  const NO_SHOW = "\uD83D\uDE25 No llegue"; // valor exacto que acepta el formulario
+
+  const BRANCHES = [
+    { value: VENADOS, label: "Venados" },
+    { value: NAPOLES, label: "N\u00E1poles" }
+  ];
+  const ROLES = [
+    { value: "Titular", label: "Titular" },
+    { value: "Auxiliar", label: "Auxiliar" },
+    { value: NO_SHOW, label: "\uD83D\uDE25 No llegu\u00E9", cls: "noshow" }
+  ];
+
+  const TIME_PRESETS = ["10:00", "19:00", "20:00"];
+
+  // Horario sugerido según el día de la semana (0 = domingo)
+  const MON_WED = { branch: NAPOLES, time: "19:00", salsa: "Titular", bachata: "Auxiliar" };
+  const TUE_THU = { branch: VENADOS, time: "20:00", salsa: "", bachata: "" };
+  const WEEKEND = { branch: VENADOS, time: "10:00", salsa: "", bachata: "" };
+  const NONE = { branch: "", time: "", salsa: "", bachata: "" };
+  const SCHEDULE = {
+    0: WEEKEND, 1: MON_WED, 2: TUE_THU, 3: MON_WED, 4: TUE_THU, 5: NONE, 6: WEEKEND
+  };
+
+  const DOW_LONG = ["domingo", "lunes", "martes", "mi\u00E9rcoles", "jueves", "viernes", "s\u00E1bado"];
+  const DOW_SHORT = ["dom", "lun", "mar", "mi\u00E9", "jue", "vie", "s\u00E1b"];
+  const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+                  "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+  // ---------- Utilidades de fecha/hora ----------
+  const pad = (n) => String(n).padStart(2, "0");
+  const toISO = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const fromISO = (iso) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+  const to12 = (hhmm) => {
+    if (!/^\d{2}:\d{2}$/.test(hhmm)) return "";
+    const [h, m] = hhmm.split(":").map(Number);
+    const suffix = h >= 12 ? "pm" : "am";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ":" + pad(m) + " " + suffix;
+  };
+
+  // ---------- Estado ----------
+  const state = {
+    name: DEFAULT_NAME,
+    date: toISO(new Date()),
+    branch: "",
+    time: "",
+    salsa: "",
+    bachata: ""
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    who: $("who"), dateLong: $("dateLong"), name: $("name"), days: $("days"),
+    dateInput: $("dateInput"), autoNote: $("autoNote"), branch: $("branch"),
+    time: $("time"), time12: $("time12"), timeChips: $("timeChips"),
+    salsa: $("salsa"), bachata: $("bachata"), noShow: $("noShow"),
+    reset: $("reset"), send: $("send"), status: $("status"),
+    done: $("done"), doneText: $("doneText"), again: $("again")
+  };
+
+  function suggestion() {
+    return SCHEDULE[fromISO(state.date).getDay()] || NONE;
+  }
+
+  function applyDefaults() {
+    const s = suggestion();
+    state.branch = s.branch;
+    state.time = s.time;
+    state.salsa = s.salsa;
+    state.bachata = s.bachata;
+  }
+
+  function longDate(iso) {
+    const d = fromISO(iso);
+    return DOW_LONG[d.getDay()] + " " + d.getDate() + " de " + MONTHS[d.getMonth()] + " de " + d.getFullYear();
+  }
+
+  // ---------- Renderizado ----------
+  function renderName() {
+    if (!els.name.options.length) {
+      NAMES.forEach((n) => {
+        const o = document.createElement("option");
+        o.value = n;
+        o.textContent = n;
+        els.name.appendChild(o);
+      });
+    }
+    els.name.value = state.name;
+    els.who.textContent = state.name;
+  }
+
+  function renderDays() {
+    els.days.textContent = "";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let selectedInStrip = false;
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const iso = toISO(d);
+      const selected = iso === state.date;
+      if (selected) selectedInStrip = true;
+
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "day";
+      b.setAttribute("aria-pressed", String(selected));
+      b.setAttribute("aria-label", longDate(iso));
+
+      const dow = document.createElement("span");
+      dow.className = "dow";
+      dow.textContent = DOW_SHORT[d.getDay()];
+      const num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(d.getDate());
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = i === 0 ? "Hoy" : i === 1 ? "Ayer" : "";
+
+      b.append(dow, num, tag);
+      b.addEventListener("click", () => setDate(iso));
+      els.days.appendChild(b);
+    }
+
+    els.dateInput.value = state.date;
+    els.dateInput.classList.toggle("active", !selectedInStrip);
+  }
+
+  function renderSegment(container, options, key) {
+    container.textContent = "";
+    options.forEach((opt) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt" + (opt.cls ? " " + opt.cls : "");
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", String(state[key] === opt.value));
+      b.textContent = opt.label;
+      b.addEventListener("click", () => {
+        state[key] = opt.value;
+        clearInvalid(key);
+        renderForm();
+      });
+      container.appendChild(b);
+    });
+  }
+
+  function renderTime() {
+    els.time.value = state.time;
+    els.time12.textContent = "";
+    if (state.time) {
+      const strong = document.createElement("strong");
+      strong.textContent = to12(state.time);
+      els.time12.append("Se enviará: ", strong);
+    }
+    els.timeChips.textContent = "";
+    TIME_PRESETS.forEach((t) => {
+      const c = document.createElement("button");
+      c.type = "button";
+      c.className = "chip";
+      c.textContent = to12(t);
+      c.setAttribute("aria-pressed", String(state.time === t));
+      c.addEventListener("click", () => {
+        state.time = t;
+        clearInvalid("time");
+        renderForm();
+      });
+      els.timeChips.appendChild(c);
+    });
+    renderMinutes();
+  }
+
+  // Selector manual de minutos
+  let minOpen = false;
+
+  function setMinute(mm) {
+    if (!/^\d{2}:\d{2}$/.test(state.time)) return;
+    state.time = state.time.slice(0, 2) + ":" + pad(mm);
+    clearInvalid("time");
+    renderTime();
+  }
+
+  function stepMinute(delta) {
+    if (!/^\d{2}:\d{2}$/.test(state.time)) return;
+    setMinute((Number(state.time.slice(3, 5)) + delta + 60) % 60);
+  }
+
+  function renderMinutes() {
+    const hasTime = /^\d{2}:\d{2}$/.test(state.time);
+    const mins = hasTime ? Number(state.time.slice(3, 5)) : -1;
+    $("minPanel").hidden = !minOpen;
+    $("minToggle").setAttribute("aria-expanded", String(minOpen));
+    $("minToggle").textContent = minOpen ? "Ocultar minutos" : "Elegir minutos";
+    $("minVal").textContent = hasTime ? ":" + pad(mins) : "--";
+    $("minDown").disabled = !hasTime;
+    $("minUp").disabled = !hasTime;
+    if (!hasTime && minOpen) {
+      els.time12.textContent = "Primero elige una hora para ajustar los minutos.";
+    }
+    const box = $("minChips");
+    box.textContent = "";
+    for (let m = 0; m < 60; m += 5) {
+      const c = document.createElement("button");
+      c.type = "button";
+      c.className = "chip";
+      c.textContent = pad(m);
+      c.disabled = !hasTime;
+      c.setAttribute("aria-label", "Minuto " + pad(m));
+      c.setAttribute("aria-pressed", String(hasTime && mins === m));
+      c.addEventListener("click", () => setMinute(m));
+      box.appendChild(c);
+    }
+  }
+
+  function renderNote() {
+    const d = fromISO(state.date);
+    const s = suggestion();
+    els.autoNote.textContent = "";
+    const strong = document.createElement("strong");
+    strong.textContent = DOW_LONG[d.getDay()];
+    if (s === NONE) {
+      els.autoNote.append(strong, ": sin horario sugerido, elige tú los datos.");
+      return;
+    }
+    let text = ": " + s.branch + " \u00B7 " + to12(s.time);
+    if (s.salsa) text += " \u00B7 Salsa " + s.salsa + " \u00B7 Bachata " + s.bachata;
+    els.autoNote.append("Sugerido para ", strong, text);
+  }
+
+  function renderForm() {
+    renderName();
+    renderDays();
+    els.dateLong.textContent = longDate(state.date);
+    renderNote();
+    renderSegment(els.branch, BRANCHES, "branch");
+    renderTime();
+    renderSegment(els.salsa, ROLES, "salsa");
+    renderSegment(els.bachata, ROLES, "bachata");
+  }
+
+  // ---------- Acciones ----------
+  function setDate(iso) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+    state.date = iso;
+    applyDefaults();
+    clearAllInvalid();
+    setStatus("");
+    renderForm();
+  }
+
+  function clearInvalid(key) {
+    const card = $("card-" + key);
+    if (card) card.classList.remove("invalid");
+  }
+  function clearAllInvalid() {
+    document.querySelectorAll(".card.invalid").forEach((c) => c.classList.remove("invalid"));
+  }
+
+  function setStatus(msg, isError) {
+    els.status.textContent = msg;
+    els.status.classList.toggle("err", Boolean(isError));
+  }
+
+  function validate() {
+    const labels = {
+      name: "nombre", date: "fecha", branch: "sucursal",
+      time: "hora de llegada", salsa: "salsa", bachata: "bachata"
+    };
+    const missing = Object.keys(labels).filter((k) => !state[k]);
+    clearAllInvalid();
+    missing.forEach((k) => $("card-" + k).classList.add("invalid"));
+    if (missing.length) {
+      $("card-" + missing[0]).scrollIntoView({ behavior: "smooth", block: "center" });
+      setStatus("Falta: " + missing.map((k) => labels[k]).join(", "), true);
+      return false;
+    }
+    return true;
+  }
+
+  function buildBody() {
+    const [y, m, d] = state.date.split("-").map(Number);
+    const [hh, mm] = state.time.split(":").map(Number);
+    const p = new URLSearchParams();
+    p.set("entry." + ENTRY.name, state.name);
+    p.set("entry." + ENTRY.date + "_year", String(y));
+    p.set("entry." + ENTRY.date + "_month", String(m));
+    p.set("entry." + ENTRY.date + "_day", String(d));
+    p.set("entry." + ENTRY.branch, state.branch);
+    p.set("entry." + ENTRY.time + "_hour", String(hh));
+    p.set("entry." + ENTRY.time + "_minute", String(mm));
+    p.set("entry." + ENTRY.salsa, state.salsa);
+    p.set("entry." + ENTRY.bachata, state.bachata);
+    p.set("pageHistory", "0");
+    return p;
+  }
+
+  function sendLabel() {
+    return testMode ? "Probar env\u00EDo (no se env\u00EDa)" : "Enviar asistencia";
+  }
+
+  function previewLines(body) {
+    return Array.from(body.entries()).map(([k, v]) => k + " = " + v).join("\n");
+  }
+
+  // Comprueba que los valores existan tal cual en las opciones del formulario.
+  function checkValues() {
+    const problems = [];
+    if (!NAMES.includes(state.name)) problems.push("nombre");
+    if (!BRANCHES.some((b) => b.value === state.branch)) problems.push("sucursal");
+    if (!ROLES.some((r) => r.value === state.salsa)) problems.push("salsa");
+    if (!ROLES.some((r) => r.value === state.bachata)) problems.push("bachata");
+    if (!/^\d{2}:\d{2}$/.test(state.time)) problems.push("hora");
+    return problems;
+  }
+
+  function showDone(title, text, payload) {
+    $("doneTitle").textContent = title;
+    els.doneText.textContent = text;
+    const pre = $("payload");
+    pre.textContent = payload;
+    pre.hidden = !payload;
+    els.done.hidden = false;
+    els.again.focus();
+  }
+
+  // Ventana emergente propia para confirmar acciones
+  function askConfirm(opts) {
+    return new Promise((resolve) => {
+      const box = $("confirm");
+      const yes = $("confirmYes");
+      const no = $("confirmNo");
+      const prev = document.activeElement;
+      $("confirmTitle").textContent = opts.title;
+      $("confirmText").textContent = opts.text;
+      yes.textContent = opts.yes;
+      box.hidden = false;
+      no.focus();
+
+      const finish = (value) => {
+        box.hidden = true;
+        yes.removeEventListener("click", onYes);
+        no.removeEventListener("click", onNo);
+        box.removeEventListener("click", onBackdrop);
+        document.removeEventListener("keydown", onKey);
+        if (prev && prev.isConnected && typeof prev.focus === "function") prev.focus();
+        resolve(value);
+      };
+      const onYes = () => finish(true);
+      const onNo = () => finish(false);
+      const onBackdrop = (e) => { if (e.target === box) finish(false); };
+      const onKey = (e) => { if (e.key === "Escape") finish(false); };
+
+      yes.addEventListener("click", onYes);
+      no.addEventListener("click", onNo);
+      box.addEventListener("click", onBackdrop);
+      document.addEventListener("keydown", onKey);
+    });
+  }
+
+  async function submit() {
+    if (!validate()) return;
+    const problems = checkValues();
+    if (problems.length) {
+      setStatus("Valor no v\u00E1lido en: " + problems.join(", "), true);
+      return;
+    }
+    const body = buildBody();
+    const summary = state.name + " \u00B7 " + longDate(state.date) + " \u00B7 " + to12(state.time);
+
+    if (testMode) {
+      const saved = saveFromForm();
+      showDone(
+        "Prueba lista \u00B7 no se envi\u00F3",
+        summary + (saved ? "" : " (no se pudo guardar en Ganancias)") +
+          ". No se envi\u00F3 nada a Google. Esto es lo que se mandar\u00EDa:",
+        previewLines(body)
+      );
+      return;
+    }
+
+    const okSend = await askConfirm({
+      title: "\u00BFEnviar de verdad?",
+      text: summary + ". Se enviar\u00E1 al formulario real de Google.",
+      yes: "S\u00ED, enviar"
+    });
+    if (!okSend) return;
+
+    els.send.disabled = true;
+    els.send.textContent = "Enviando\u2026";
+    setStatus("");
+    try {
+      // Google Forms no permite leer la respuesta desde otro origen (no-cors).
+      await fetch(ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString()
+      });
+      const saved = saveFromForm();
+      showDone("\u00A1Asistencia enviada!", summary + (saved ? "" : " (no se pudo guardar en Ganancias)"), "");
+    } catch (err) {
+      setStatus("No se pudo enviar. Revisa tu conexi\u00F3n e int\u00E9ntalo de nuevo.", true);
+    } finally {
+      els.send.disabled = false;
+      els.send.textContent = sendLabel();
+    }
+  }
+
+  // ---------- Eventos ----------
+  els.name.addEventListener("change", () => {
+    state.name = els.name.value;
+    clearInvalid("name");
+    renderForm();
+  });
+  els.dateInput.addEventListener("change", () => {
+    if (els.dateInput.value) setDate(els.dateInput.value);
+  });
+  els.time.addEventListener("input", () => {
+    state.time = els.time.value;
+    clearInvalid("time");
+    renderTime();
+  });
+  els.noShow.addEventListener("click", () => {
+    state.salsa = NO_SHOW;
+    state.bachata = NO_SHOW;
+    state.time = "00:00";
+    clearAllInvalid();
+    setStatus("");
+    renderForm();
+  });
+  els.reset.addEventListener("click", () => {
+    applyDefaults();
+    clearAllInvalid();
+    setStatus("");
+    renderForm();
+  });
+  els.send.addEventListener("click", submit);
+  $("minToggle").addEventListener("click", () => {
+    minOpen = !minOpen;
+    renderTime();
+  });
+  $("minDown").addEventListener("click", () => stepMinute(-1));
+  $("minUp").addEventListener("click", () => stepMinute(1));
+  els.again.addEventListener("click", () => {
+    els.done.hidden = true;
+    setDate(toISO(new Date()));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !els.done.hidden) els.again.click();
+  });
+
+  // ---------- Modo prueba ----------
+  const MODE_KEY = "laclave.modoPrueba.v1";
+  let testMode = true; // por seguridad, arranca en modo prueba
+  try { testMode = localStorage.getItem(MODE_KEY) !== "0"; } catch (err) { /* sin almacenamiento */ }
+
+  function renderMode() {
+    $("testMode").checked = testMode;
+    $("modeLabel").classList.toggle("live", !testMode);
+    $("modeText").textContent = testMode ? "Modo prueba: no se env\u00EDa nada" : "Env\u00EDo REAL activado";
+    els.send.textContent = sendLabel();
+  }
+
+  // ---------- Ganancias ----------
+  const PAY = { "Titular": 100, "Auxiliar": 50 }; // NO_SHOW cuenta 0
+  const STORE_KEY = "laclave.ganancias.v1";
+  const isIso = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const money = (n) => "$" + n.toLocaleString("es-MX");
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const payFor = (role) => (Object.prototype.hasOwnProperty.call(PAY, role) ? PAY[role] : 0);
+  const dayTotal = (e) => payFor(e.salsa) + payFor(e.bachata);
+  const roleLabel = (r) => (r === NO_SHOW ? "No llegu\u00E9" : r || "\u2014");
+
+  function weekStartISO(iso) {
+    const d = fromISO(iso);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // semana de lunes a domingo
+    return toISO(d);
+  }
+  function shortDay(iso) {
+    const d = fromISO(iso);
+    return d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+  }
+  function weekTitle(startISO) {
+    const end = fromISO(startISO);
+    end.setDate(end.getDate() + 6);
+    return "Semana " + shortDay(startISO) + " \u2013 " + shortDay(toISO(end));
+  }
+  function monthTitle(ym) {
+    const [y, m] = ym.split("-").map(Number);
+    return cap(MONTHS[m - 1]) + " " + y;
+  }
+
+  function loadEarnings() {
+    const clean = {};
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+      if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+        Object.keys(raw).forEach((k) => {
+          const e = raw[k];
+          if (!isIso(k) || !e || typeof e !== "object") return;
+          clean[k] = {
+            branch: String(e.branch || ""),
+            time: String(e.time || ""),
+            salsa: String(e.salsa || ""),
+            bachata: String(e.bachata || "")
+          };
+        });
+      }
+    } catch (err) { /* datos ilegibles: se empieza vac\u00EDo */ }
+    return clean;
+  }
+  let earnings = loadEarnings();
+
+  function persistEarnings() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(earnings));
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function saveEarning(iso, entry) {
+    earnings[iso] = entry;
+    const ok = persistEarnings();
+    renderEarnings();
+    return ok;
+  }
+
+  function saveFromForm() {
+    return saveEarning(state.date, {
+      branch: state.branch, time: state.time, salsa: state.salsa, bachata: state.bachata
+    });
+  }
+
+  function sumWhere(pred) {
+    return Object.keys(earnings).filter(pred).reduce((t, k) => t + dayTotal(earnings[k]), 0);
+  }
+
+  const todayISO0 = toISO(new Date());
+  const openKeys = new Set([
+    "m" + todayISO0.slice(0, 7),
+    "w" + todayISO0.slice(0, 7) + weekStartISO(todayISO0)
+  ]);
+
+  function makeAcc(key, titleText, total) {
+    const el = document.createElement("details");
+    el.className = "acc";
+    el.open = openKeys.has(key);
+    el.addEventListener("toggle", () => {
+      if (el.open) openKeys.add(key); else openKeys.delete(key);
+    });
+    const s = document.createElement("summary");
+    const t = document.createElement("span");
+    t.className = "acc-t";
+    t.textContent = titleText;
+    const m = document.createElement("strong");
+    m.className = "acc-m";
+    m.textContent = money(total);
+    s.append(t, m);
+    const body = document.createElement("div");
+    body.className = "acc-body";
+    el.append(s, body);
+    return { el, body };
+  }
+
+  function dayNode(k) {
+    const e = earnings[k];
+    const d = fromISO(k);
+    const box = makeAcc("d" + k, cap(DOW_LONG[d.getDay()]) + " " + d.getDate(), dayTotal(e));
+    box.body.className = "detail";
+
+    const lines = [];
+    const where = [e.branch, e.time ? to12(e.time) : ""].filter(Boolean).join(" \u00B7 ");
+    if (where) lines.push(["Sucursal", where]);
+    lines.push(["Salsa", roleLabel(e.salsa) + " \u2014 " + money(payFor(e.salsa))]);
+    lines.push(["Bachata", roleLabel(e.bachata) + " \u2014 " + money(payFor(e.bachata))]);
+    lines.push(["Total del d\u00EDa", money(dayTotal(e))]);
+    lines.forEach(([label, value]) => {
+      const p = document.createElement("p");
+      const s = document.createElement("strong");
+      s.textContent = label + ": ";
+      p.append(s, value);
+      box.body.appendChild(p);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "mini danger";
+    del.textContent = "Borrar";
+    del.addEventListener("click", async () => {
+      const okDel = await askConfirm({
+        title: "\u00BFBorrar este d\u00EDa?",
+        text: longDate(k) + " se quitar\u00E1 de Ganancias en este navegador.",
+        yes: "S\u00ED, borrar"
+      });
+      if (!okDel) return;
+      delete earnings[k];
+      persistEarnings();
+      renderEarnings();
+    });
+    actions.append(del);
+    box.body.appendChild(actions);
+    return box.el;
+  }
+
+  function renderEarnings() {
+    const today = toISO(new Date());
+    const wk = weekStartISO(today);
+    $("sumWeek").textContent = money(sumWhere((k) => weekStartISO(k) === wk));
+    $("sumMonth").textContent = money(sumWhere((k) => k.slice(0, 7) === today.slice(0, 7)));
+    $("sumYear").textContent = money(sumWhere((k) => k.slice(0, 4) === today.slice(0, 4)));
+
+    const list = $("earnList");
+    list.textContent = "";
+    const keys = Object.keys(earnings).sort().reverse();
+    if (!keys.length) {
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = "Todav\u00EDa no hay d\u00EDas guardados.";
+      list.appendChild(p);
+      return;
+    }
+
+    const months = new Map(); // mes -> semana -> d\u00EDas (de m\u00E1s nuevo a m\u00E1s viejo)
+    keys.forEach((k) => {
+      const m = k.slice(0, 7);
+      const w = weekStartISO(k);
+      if (!months.has(m)) months.set(m, new Map());
+      const weeks = months.get(m);
+      if (!weeks.has(w)) weeks.set(w, []);
+      weeks.get(w).push(k);
+    });
+
+    const total = (days) => days.reduce((t, k) => t + dayTotal(earnings[k]), 0);
+    months.forEach((weeks, m) => {
+      const mBox = makeAcc("m" + m, monthTitle(m), total(Array.from(weeks.values()).flat()));
+      weeks.forEach((days, w) => {
+        const wBox = makeAcc("w" + m + w, weekTitle(w), total(days));
+        days.forEach((k) => wBox.body.appendChild(dayNode(k)));
+        mBox.body.appendChild(wBox.el);
+      });
+      list.appendChild(mBox.el);
+    });
+  }
+
+  function showView(name) {
+    const earn = name === "earn";
+    $("view-att").hidden = earn;
+    $("view-earn").hidden = !earn;
+    $("bar").hidden = earn;
+    $("tab-att").setAttribute("aria-selected", String(!earn));
+    $("tab-earn").setAttribute("aria-selected", String(earn));
+    if (earn) renderEarnings();
+    window.scrollTo({ top: 0 });
+  }
+
+  $("tab-att").addEventListener("click", () => showView("att"));
+  $("tab-earn").addEventListener("click", () => showView("earn"));
+  $("testMode").addEventListener("change", (ev) => {
+    testMode = ev.target.checked;
+    try { localStorage.setItem(MODE_KEY, testMode ? "1" : "0"); } catch (err) { /* sin almacenamiento */ }
+    renderMode();
+    setStatus(testMode ? "" : "Cuidado: ahora el bot\u00F3n env\u00EDa de verdad.", !testMode);
+  });
+
+  // ---------- Inicio ----------
+  applyDefaults();
+  renderForm();
+  renderMode();
+  renderEarnings();
+})();
+</script>
+</body>
+</html>
